@@ -28,9 +28,12 @@ const char *LINKER_PATH = "/system/bin/linker64";
 
 int main(int argc, char **argv) {
     //需要三个参数 进程包名 目标方法名称 libhook路径
-    char *pkgname = "com.example.egguncle.hidekeyinjni";
-    char *target_func_name = "hookEntry";
-    char *hook_so_path = "/data/local/tmp/libhooker.so";
+//    char *pkgname = "com.test.gothooktest";
+//    char *target_func_name = "hook_entry";
+//    char *hook_so_path = "/data/local/tmp/libhooker.so";
+    char *pkgname = "";
+    char *target_func_name = "";
+    char *hook_so_path = "";
 
     if (argc != 4) {
         printf("args error\n");
@@ -139,21 +142,10 @@ int main(int argc, char **argv) {
     void *hook_func_addr = (void *) (ptrace_retval(&current_regs));
     printf("hook func addr is %lx\n", ptrace_retval(&current_regs));
 
-    char *target_lib_path = get_libs_path(pid, pkgname);
-    printf("target lib path is %s\n", target_lib_path);
-
-    //将目标so路径写入目标进程的内存中
-    mmap_base += FUNCTION_PARAM_ADDR_OFFSET;
-    ptrace_write_data(pid, mmap_base, target_lib_path, strlen(target_lib_path) + 1);
-    parameters[0] = mmap_base;
-    char *target_function_name = "getkey";
-    mmap_base += FUNCTION_PARAM_ADDR_OFFSET;
-    ptrace_write_data(pid, mmap_base, target_function_name, strlen(target_function_name) + 1);
-    parameters[1] = mmap_base;
 
     //printf("%lx ,%lx\n",parameters[0],parameters[1]);
 
-    if (ptrace_call_wrapper(pid, target_func_name, hook_func_addr, parameters, 2, &current_regs) < 0) {
+    if (ptrace_call_wrapper(pid, target_func_name, hook_func_addr, parameters, 0, &current_regs) < 0) {
         printf("call target %s error", target_func_name);
         return -1;
     }
